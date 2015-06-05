@@ -158,9 +158,7 @@
 
     hiveClient <- .j2r.HiveJdbcClient(hiveServer2)
     hiveClient$connect(host, as.integer(port), db, user,password, j.properties)
-    hiveClient$addJar(.FS_JAR_PATH())
 
-   .registerUDFs(hiveClient)
    .setConfigurations(hiveClient)
 
    .setEnv("hiveClient", hiveClient)
@@ -184,8 +182,9 @@
     }
 
     if (!is.empty(properties)) {
-        l <- lapply(strsplit(properties, split = "="), function(x) { gsub("^\\s+|\\s+$", "", x) })
-        lapply(l, function(p) { if (length(p) == 2) { j.properties$setProperty(p[1], p[2]) } })
+        l <- sapply(strsplit(properties, split = ";"), function(x) { gsub("^\\s+|\\s+$", "", x) })
+        l <- sapply(l,function(x) {strsplit(x, "=")})
+        lapply(l, function(x) {j.properties$setProperty(x[1],x[2])})
     }
     return(j.properties)
 }
